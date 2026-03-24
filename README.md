@@ -36,6 +36,8 @@ Firmware updates and USB workflow: [Update your firmware](https://badgewa.re/doc
 
 `main.py` is a tiny hello world and does not change the working directory. If you add assets or local imports, set paths explicitly: in the simulator your files usually live at the virtual FS root (`/` after `make deploy-sim`); on hardware they often live under **`/system/apps/badge`** (see stock `system/apps/badge` in badgeware-simulator).
 
+**Simulator:** root `main.py` must define a global **`update()`** and must **not** call `badgeware.run()`. The desktop binary calls `update()` each frame after `main.py` returns; `run()` would block during load and the UI would not update. **Hardware:** the same file calls `badgeware.run(update)` when `simulator` is not importable.
+
 ## Editor type checking
 
 `typings/badgeware.pyi` plus `pyrightconfig.json` satisfy Pyright/BasedPyright for `from badgeware import run`. Picovector globals (`screen`, `color`, …) are read with `getattr(builtins, …)` so the checker does not need fake builtins.
