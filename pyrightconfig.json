@@ -1,7 +1,0 @@
-{
-  "include": ["main.py"],
-  "stubPath": "typings",
-  "pythonVersion": "3.12",
-  "typeCheckingMode": "basic",
-  "reportMissingModuleSource": "none"
-}
