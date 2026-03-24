@@ -1,0 +1,12 @@
+# Paths excluded from rsync deploy (badge + simulator).
+# Same line format as .gitignore patterns.
+
+.git/
+.github/
+.cursor/
+scripts/
+Makefile
+README.md
+.env
+.env.*
+*.md
