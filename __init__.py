@@ -1,12 +1,10 @@
-import sys
 import os
+import sys
 
 sys.path.insert(0, "/system/apps/badge")
 os.chdir("/system/apps/badge")
 
 CX = screen.width / 2
-CY = screen.height / 2
-
 screen.antialias = screen.X2
 
 # details to be shown on the card
@@ -17,22 +15,25 @@ id_role = "Developer Advocate @ AWS"
 id_window = image(id_photo.width, id_photo.height)
 id_window.blit(id_photo, vec2(0, 0))
 id_window.dither()
+social_qr = image.load("social-qr.png")
 
-# see the 'assets/social' folder to see what's supported
-id_socials = {"twitter": {"icon": None, "handle": "@Hacksore"},
-              "github": {"icon": None, "handle": "@Hacksore"},
-              "discord": {"icon": None, "handle": "@Hacksore"},
-              "linkedin": {"icon": None, "handle": "/in/seanboult"}
-              }
+# These icons ship with the built-in badge app in official Badger firmware.
+id_socials = {
+    "twitter": {"icon": None, "handle": "@Hacksore"},
+    "github": {"icon": None, "handle": "@Hacksore"},
+    "discord": {"icon": None, "handle": "@Hacksore"},
+    "linkedin": {"icon": None, "handle": "/in/seanboult"},
+}
 
 # load in the social icons
-for key in id_socials.keys():
-    id_socials[key]["icon"] = image.load(f"assets/socials/{key}.png")
+for key in id_socials:
+    id_socials[key]["icon"] = image.load(
+        f"/system/apps/badge/assets/socials/{key}.png"
+    )
 
 # id card variables
 id_body = shape.rectangle(0, 0, 240, 155)
 id_outline = shape.rectangle(0, 0, 240, 155).stroke(2)
-background = brush.pattern(color.black, color.white, 6)
 rear_view = False
 card_pos = (10, 10)
 pattern = 25
@@ -47,10 +48,10 @@ def center_text(text, y):
 
 
 def update():
-    global rear_view, background, pattern
+    global rear_view, pattern
 
     # unpack the x and y for the card
-    x, y = card_pos
+    _, y = card_pos
 
     # clear the screen
     screen.pen = brush.pattern(color.white, color.black, pattern)
@@ -97,10 +98,11 @@ def update():
     else:
         screen.pen = color.black
         screen.font = small_font
-        for account in id_socials.items():
-            screen.blit(account[1]["icon"], vec2(30, socials_y))
-            screen.text(account[1]["handle"], 55, socials_y)
+        for account in id_socials.values():
+            screen.blit(account["icon"], vec2(30, socials_y))
+            screen.text(account["handle"], 55, socials_y)
             socials_y += 31
+        screen.blit(social_qr, vec2(151, 44))
 
     badge.update()
     wait_for_button_or_alarm(timeout=5000)

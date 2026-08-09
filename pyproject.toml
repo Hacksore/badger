@@ -1,0 +1,39 @@
+[project]
+name = "badger-badge"
+version = "0.1.0"
+description = "Personal Badgeware app and deployment tools for the Badger 2350"
+requires-python = ">=3.12"
+dependencies = []
+
+[dependency-groups]
+dev = [
+    "qrcode[pil]>=8.2",
+    "ruff>=0.12.0",
+]
+
+[tool.ruff]
+target-version = "py312"
+builtins = [
+  "BUTTON_A",
+  "BUTTON_B",
+  "BUTTON_C",
+  "BUTTON_DOWN",
+  "BUTTON_UP",
+  "badge",
+  "brush",
+  "clamp",
+  "color",
+  "framebuffer",
+  "image",
+  "io",
+  "mat3",
+  "rom_font",
+  "run",
+  "screen",
+  "shape",
+  "vec2",
+  "wait_for_button_or_alarm",
+]
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F"]
