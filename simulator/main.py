@@ -38,7 +38,8 @@ for name in ("BUTTON_A", "BUTTON_B", "BUTTON_C", "BUTTON_UP", "BUTTON_DOWN"):
 # Badgeware Desktop defaults to a generic 160x120 canvas. Match the physical
 # Badger 2350 so its pixel-based layouts render exactly as they do on-device.
 simulator.resolution(BADGER_WIDTH, BADGER_HEIGHT)
-builtins.screen = image(BADGER_WIDTH, BADGER_HEIGHT, framebuffer)
+screen = image(BADGER_WIDTH, BADGER_HEIGHT, framebuffer)
+builtins.screen = screen
 screen.font = badgeware.DEFAULT_FONT
 screen.pen = badgeware.BG
 
