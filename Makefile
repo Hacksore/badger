@@ -8,7 +8,7 @@ BOOT_MOUNT ?= $(firstword $(wildcard /Volumes/RP2350))
 SIM_DIR ?= ../badgeware-simulator
 BUILD_DIR := build
 SIM_ROOT := $(abspath $(BUILD_DIR)/simulator-root)
-APP_FILES := __init__.py avatar.png social-qr.png
+APP_FILES := __init__.py avatar.png rocket.png social-qr.png
 
 .PHONY: help sim deploy firmware _check
 

@@ -16,17 +16,18 @@ id_window = image(id_photo.width, id_photo.height)
 id_window.blit(id_photo, vec2(0, 0))
 id_window.dither()
 social_qr = image.load("social-qr.png")
+name_rocket = image.load("rocket.png")
 
 # These icons ship with the built-in badge app in official Badger firmware.
 id_socials = {
     "twitter": {"icon": None, "handle": "@Hacksore"},
     "github": {"icon": None, "handle": "@Hacksore"},
     "discord": {"icon": None, "handle": "@Hacksore"},
-    "linkedin": {"icon": None, "handle": "/in/seanboult"},
 }
+social_order = ("twitter", "github", "discord")
 
 # load in the social icons
-for key in id_socials:
+for key in social_order:
     id_socials[key]["icon"] = image.load(
         f"/system/apps/badge/assets/socials/{key}.png"
     )
@@ -85,8 +86,6 @@ def update():
     screen.shape(id_outline)
 
     photo_y = y + 18 + id_photo.height
-    socials_y = 32
-
     # Draw the card information
     screen.pen = color.black
     if not rear_view:
@@ -97,12 +96,49 @@ def update():
         center_text(id_role, photo_y + 31)
     else:
         screen.pen = color.black
+        screen.font = large_font
+        header_gap = 6
+        header_width, header_height = screen.measure_text(id_name)
+        header_x = (screen.width - header_width - header_gap - name_rocket.width) / 2
+        header_y = y + 6
+        screen.text(id_name, header_x, header_y)
+        screen.blit(
+            name_rocket,
+            vec2(
+                header_x + header_width + header_gap,
+                header_y + ((header_height - name_rocket.height) / 2),
+            ),
+        )
         screen.font = small_font
-        for account in id_socials.values():
+
+        qr_quiet_zone = 12
+        qr_label_gap = 4
+        qr_label = "SOCIALS"
+        qr_label_width, qr_label_height = screen.measure_text(qr_label)
+        qr_visible_height = social_qr.height - (qr_quiet_zone * 2)
+        content_height = qr_visible_height + qr_label_gap + qr_label_height
+        content_top = y + 44
+
+        social_icon_height = id_socials["twitter"]["icon"].height
+        social_step = int(
+            (content_height - social_icon_height) / (len(id_socials) - 1)
+        )
+        socials_y = content_top
+        for key in social_order:
+            account = id_socials[key]
             screen.blit(account["icon"], vec2(30, socials_y))
             screen.text(account["handle"], 55, socials_y)
-            socials_y += 31
-        screen.blit(social_qr, vec2(151, 44))
+            socials_y += social_step
+
+        qr_x = 149
+        qr_y = content_top - qr_quiet_zone
+        qr_center_x = qr_x + (social_qr.width // 2)
+        screen.blit(social_qr, vec2(qr_x, qr_y))
+        screen.text(
+            qr_label,
+            qr_center_x - (qr_label_width // 2),
+            content_top + qr_visible_height + qr_label_gap,
+        )
 
     badge.update()
     wait_for_button_or_alarm(timeout=5000)
