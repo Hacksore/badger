@@ -4,6 +4,14 @@ import sys
 sys.path.insert(0, "/system/apps/badge")
 os.chdir("/system/apps/badge")
 
+# Static declarations for pylsp/Pyflakes. Badgeware injects these names before
+# running the app, so this block must never execute on the badge or simulator.
+if False:
+    badge = brush = clamp = color = image = mat3 = None
+    rom_font = run = screen = shape = vec2 = None
+    wait_for_button_or_alarm = None
+    BUTTON_B = BUTTON_DOWN = BUTTON_UP = None
+
 CX = screen.width / 2
 screen.antialias = screen.X2
 

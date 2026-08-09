@@ -5,6 +5,11 @@ import builtins
 import badgeware
 import simulator
 
+# Static declarations for pylsp/Pyflakes. The simulator boot process injects
+# these names before this entry point runs.
+if False:
+    framebuffer = image = io = None
+
 BADGER_WIDTH = 264
 BADGER_HEIGHT = 176
 
