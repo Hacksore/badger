@@ -10,7 +10,7 @@ screen.antialias = screen.X2
 # details to be shown on the card
 id_photo = image.load("avatar.png")
 id_name = "Sean Boult"
-id_role = "Developer Advocate @ AWS"
+id_role = "Developer @ AWS"
 
 id_window = image(id_photo.width, id_photo.height)
 id_window.blit(id_photo, vec2(0, 0))
