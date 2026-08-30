@@ -49,6 +49,7 @@ card_pos = (10, 10)
 pattern = 25
 
 small_font = rom_font.smart
+label_font = rom_font.smart
 large_font = rom_font.ignore
 
 
@@ -143,15 +144,19 @@ def update():
 
         qr_quiet_zone = 12
         qr_label_gap = 4
-        qr_label = "SOCIALS"
-        qr_label_width, qr_label_height = screen.measure_text(qr_label)
+        qr_label_line_gap = 1
+        qr_label_lines = ("PERSONAL", "WEBSITE")
+        _, social_label_height = screen.measure_text("SOCIALS")
+        screen.font = label_font
+        qr_label_sizes = [screen.measure_text(line) for line in qr_label_lines]
+        screen.font = small_font
         qr_visible_height = social_qr.height - (qr_quiet_zone * 2)
-        content_height = qr_visible_height + qr_label_gap + qr_label_height
+        social_content_height = qr_visible_height + qr_label_gap + social_label_height
         content_top = y + 44
 
         social_icon_height = id_socials["twitter"]["icon"].height
         social_step = int(
-            (content_height - social_icon_height) / (len(id_socials) - 1)
+            (social_content_height - social_icon_height) / (len(id_socials) - 1)
         )
         socials_y = content_top
         for key in social_order:
@@ -161,14 +166,15 @@ def update():
             socials_y += social_step
 
         qr_x = 149
-        qr_y = content_top - qr_quiet_zone
-        qr_center_x = qr_x + (social_qr.width // 2)
+        qr_visible_top = content_top - 5
+        qr_y = qr_visible_top - qr_quiet_zone
         screen.blit(social_qr, vec2(qr_x, qr_y))
-        screen.text(
-            qr_label,
-            qr_center_x - (qr_label_width // 2),
-            content_top + qr_visible_height + qr_label_gap,
-        )
+        qr_label_y = qr_visible_top + qr_visible_height + qr_label_gap
+        screen.font = label_font
+        for line, (line_width, line_height) in zip(qr_label_lines, qr_label_sizes):
+            line_x = qr_x + ((social_qr.width - line_width) / 2)
+            screen.text(line, line_x, qr_label_y)
+            qr_label_y += line_height + qr_label_line_gap
 
     badge.update()
     wait_for_button_or_alarm(timeout=5000)
