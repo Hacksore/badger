@@ -114,7 +114,7 @@ def update():
         qr_visible_height = linkedin_qr.height - (qr_quiet_zone * 2)
         qr_visible_bottom = role_y + role_height
         qr_visible_top = qr_visible_bottom - qr_visible_height
-        qr_x = screen.width - content_left - linkedin_qr.width
+        qr_x = screen.width - content_left - linkedin_qr.width + 6
         qr_y = qr_visible_top - qr_quiet_zone
 
         screen.blit(linkedin_qr, vec2(qr_x, qr_y))
