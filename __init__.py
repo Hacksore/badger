@@ -24,6 +24,7 @@ id_window = image(id_photo.width, id_photo.height)
 id_window.blit(id_photo, vec2(0, 0))
 id_window.dither()
 social_qr = image.load("social-qr.png")
+linkedin_qr = image.load("linkedin-qr.png")
 name_rocket = image.load("rocket.png")
 
 # These icons ship with the built-in badge app in official Badger firmware.
@@ -49,11 +50,6 @@ pattern = 25
 
 small_font = rom_font.smart
 large_font = rom_font.ignore
-
-
-def center_text(text, y):
-    w, _ = screen.measure_text(text)
-    screen.text(text, (screen.width / 2) - (w / 2), y)
 
 
 def update():
@@ -93,15 +89,41 @@ def update():
     screen.pen = color.black
     screen.shape(id_outline)
 
-    photo_y = y + 18 + id_photo.height
     # Draw the card information
     screen.pen = color.black
     if not rear_view:
+        content_left = 20
+        photo_y = y + 15
+        role_y = photo_y + id_photo.height + 32
+
         screen.font = large_font
-        screen.blit(id_window, vec2(CX - id_photo.width / 2, y + 15))
-        center_text(id_name, photo_y)
+        name_width, _ = screen.measure_text(id_name)
+        photo_x = content_left + ((name_width - id_photo.width) / 2)
+        screen.blit(id_window, vec2(photo_x, photo_y))
+        screen.text(id_name, content_left, photo_y + id_photo.height + 4)
         screen.font = small_font
-        center_text(id_role, photo_y + 31)
+        screen.text(id_role, content_left, role_y)
+
+        qr_quiet_zone = 12
+        qr_label_gap = 4
+        qr_label_line_gap = 1
+        qr_label_lines = ("SCAN HERE", "FOR LINKEDIN")
+        qr_label_sizes = [screen.measure_text(line) for line in qr_label_lines]
+        _, role_height = screen.measure_text(id_role)
+        qr_visible_height = linkedin_qr.height - (qr_quiet_zone * 2)
+        qr_visible_bottom = role_y + role_height
+        qr_visible_top = qr_visible_bottom - qr_visible_height
+        qr_x = screen.width - content_left - linkedin_qr.width
+        qr_y = qr_visible_top - qr_quiet_zone
+
+        screen.blit(linkedin_qr, vec2(qr_x, qr_y))
+        qr_label_height = sum(height for _, height in qr_label_sizes)
+        qr_label_height += qr_label_line_gap * (len(qr_label_lines) - 1)
+        qr_label_y = qr_visible_top - qr_label_gap - qr_label_height
+        for line, (line_width, line_height) in zip(qr_label_lines, qr_label_sizes):
+            line_x = qr_x + ((linkedin_qr.width - line_width) / 2)
+            screen.text(line, line_x, qr_label_y)
+            qr_label_y += line_height + qr_label_line_gap
     else:
         screen.pen = color.black
         screen.font = large_font

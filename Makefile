@@ -8,7 +8,7 @@ BOOT_MOUNT ?= $(firstword $(wildcard /Volumes/RP2350))
 SIM_DIR ?= ../badgeware-simulator
 BUILD_DIR := build
 SIM_ROOT := $(abspath $(BUILD_DIR)/simulator-root)
-APP_FILES := __init__.py avatar.png rocket.png social-qr.png
+APP_FILES := __init__.py avatar.png rocket.png social-qr.png linkedin-qr.png
 
 .PHONY: help sim deploy firmware _check
 
@@ -22,6 +22,9 @@ help:
 social-qr.png: tools/generate_qr.py pyproject.toml uv.lock
 	$(PYTHON) tools/generate_qr.py "https://seanboult.dev" "$@"
 
+linkedin-qr.png: tools/generate_qr.py pyproject.toml uv.lock
+	$(PYTHON) tools/generate_qr.py "https://www.linkedin.com/in/seanboult" "$@"
+
 _check:
 	@command -v "$(UV)" >/dev/null 2>&1 || { \
 		echo 'error: install uv from https://docs.astral.sh/uv/' >&2; exit 1; \
@@ -29,7 +32,7 @@ _check:
 	@$(PYTHON) tools/check_app.py $(APP_FILES)
 	@$(UV) run ruff check .
 
-sim: social-qr.png _check
+sim: social-qr.png linkedin-qr.png _check
 	@if test ! -d "$(SIM_DIR)"; then \
 		git clone --recurse-submodules https://github.com/pimoroni/badgeware-simulator.git "$(SIM_DIR)"; \
 	fi
@@ -47,7 +50,7 @@ sim: social-qr.png _check
 	@rsync -a simulator/main.py "$(SIM_ROOT)/main.py"
 	@cd "$(SIM_DIR)" && ./build/micropython root="$(SIM_ROOT)" watch="$(SIM_ROOT)/system"
 
-deploy: social-qr.png _check
+deploy: social-qr.png linkedin-qr.png _check
 	@test -n "$(BADGER_MOUNT)" && test -d "$(BADGER_MOUNT)/apps" || { \
 		echo 'error: Badger drive not found; double-tap RESET and try again.' >&2; exit 1; \
 	}
