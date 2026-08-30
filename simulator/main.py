@@ -58,3 +58,4 @@ def update():
         screen.pen = badgeware.FG
     io.poll()
     app.update()
+    screen.monochrome()
