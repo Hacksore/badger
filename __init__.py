@@ -201,7 +201,7 @@ def update():
             socials_y += social_step
 
         qr_x = 149
-        qr_vertical_offset = 12
+        qr_vertical_offset = 6
         qr_visible_top = content_top - 5 + qr_vertical_offset
         qr_y = qr_visible_top - qr_quiet_zone
         screen.blit(social_qr, vec2(qr_x, qr_y))

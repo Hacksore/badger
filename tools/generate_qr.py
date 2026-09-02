@@ -16,7 +16,9 @@ def main() -> None:
     args = parser.parse_args()
 
     code = qrcode.QRCode(
-        version=None,
+        # Keep both badge QRs at the same native 111x111 footprint. Version 3
+        # has 29 data modules plus the four-module quiet zone on each side.
+        version=3,
         error_correction=qrcode.constants.ERROR_CORRECT_M,
         box_size=3,
         border=4,
