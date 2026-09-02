@@ -8,7 +8,7 @@ import simulator
 # Static declarations for pylsp/Pyflakes. The simulator boot process injects
 # these names before this entry point runs.
 if False:
-    framebuffer = image = io = None
+    font = framebuffer = image = io = None
 
 BADGER_WIDTH = 264
 BADGER_HEIGHT = 176
@@ -33,10 +33,35 @@ class SimulatorBadge:
         return None
 
 
+    @staticmethod
+    def battery_level():
+        # Desktop has no battery ADC, so keep the preview representative.
+        return 75
+
+    @staticmethod
+    def battery_voltage():
+        return 3.85
+
+
+class SimulatorRTC:
+    @staticmethod
+    def set_alarm(hours=0, minutes=0, seconds=0):
+        return None
+
+    @staticmethod
+    def clear_alarm():
+        return None
+
+
 builtins.run = simulator_run
 builtins.clamp = badgeware.clamp
 builtins.wait_for_button_or_alarm = simulator_wait
 builtins.badge = SimulatorBadge()
+builtins.rtc = SimulatorRTC()
+
+# Match the font registry exposed by current Badger firmware.
+builtins.font = badgeware.rom_font
+
 for name in ("BUTTON_A", "BUTTON_B", "BUTTON_C", "BUTTON_UP", "BUTTON_DOWN"):
     setattr(builtins, name, getattr(io, name))
 

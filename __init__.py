@@ -7,10 +7,10 @@ os.chdir("/system/apps/badge")
 # Static declarations for pylsp/Pyflakes. Badgeware injects these names before
 # running the app, so this block must never execute on the badge or simulator.
 if False:
-    badge = brush = clamp = color = image = mat3 = None
-    rom_font = run = screen = shape = vec2 = None
+    badge = color = image = None
+    font = rtc = run = screen = shape = vec2 = None
     wait_for_button_or_alarm = None
-    BUTTON_B = BUTTON_DOWN = BUTTON_UP = None
+    BUTTON_B = None
 
 CX = screen.width / 2
 screen.antialias = screen.X2
@@ -41,60 +41,77 @@ for key in social_order:
         f"/system/apps/badge/assets/socials/{key}.png"
     )
 
-# id card variables
-id_body = shape.rectangle(0, 0, 240, 155)
-id_outline = shape.rectangle(0, 0, 240, 155).stroke(2)
 rear_view = False
-card_pos = (10, 10)
-pattern = 25
+card_y = 0
+content_y_offset = 10
+battery_refresh_minutes = 30
+battery_curve = (
+    (3.30, 0),
+    (3.50, 5),
+    (3.70, 20),
+    (3.80, 50),
+    (3.90, 70),
+    (4.00, 80),
+    (4.10, 90),
+    (4.20, 100),
+)
 
-small_font = rom_font.smart
-label_font = rom_font.smart
-large_font = rom_font.ignore
+small_font = font.smart
+label_font = font.smart
+large_font = font.ignore
+
+
+def battery_level_from_voltage(voltage):
+    if voltage <= battery_curve[0][0]:
+        return battery_curve[0][1]
+
+    for index in range(1, len(battery_curve)):
+        upper_voltage, upper_level = battery_curve[index]
+        if voltage <= upper_voltage:
+            lower_voltage, lower_level = battery_curve[index - 1]
+            progress = (voltage - lower_voltage) / (upper_voltage - lower_voltage)
+            return round(lower_level + ((upper_level - lower_level) * progress))
+
+    return battery_curve[-1][1]
+
+
+def draw_battery_indicator(battery_level):
+    icon_width = 16
+    icon_height = 8
+    icon_right_margin = 8
+    icon_x = screen.width - icon_width - 1 - icon_right_margin
+    icon_y = card_y + 7
+
+    screen.pen = color.black
+    screen.shape(shape.rectangle(icon_x, icon_y, icon_width, icon_height))
+    screen.shape(shape.rectangle(icon_x + icon_width, icon_y + 2, 1, 4))
+
+    screen.pen = color.white
+    screen.shape(shape.rectangle(icon_x + 1, icon_y + 1, icon_width - 2, icon_height - 2))
+
+    fill_width = round(((icon_width - 4) / 100) * battery_level)
+    screen.pen = color.black
+    screen.shape(shape.rectangle(icon_x + 2, icon_y + 2, fill_width, icon_height - 4))
 
 
 def update():
-    global rear_view, pattern
+    global rear_view
 
-    # unpack the x and y for the card
-    _, y = card_pos
+    battery_voltage = badge.battery_voltage()
+    battery_level = battery_level_from_voltage(battery_voltage)
 
     # clear the screen
-    screen.pen = brush.pattern(color.white, color.black, pattern)
+    screen.pen = color.white
     screen.clear()
 
     if badge.pressed(BUTTON_B):
         rear_view = not rear_view
 
-    if badge.pressed(BUTTON_UP):
-        pattern += 1
-
-    if badge.pressed(BUTTON_DOWN):
-        pattern -= 1
-
-    pattern = clamp(pattern, 0, 37)
-
-    # draw the card
-    id_body.transform = mat3().translate(CX, y)
-    id_outline.transform = mat3().translate(CX, y)
-    id_body.transform = id_body.transform.translate(-120, 0)
-    id_outline.transform = id_outline.transform.translate(-120, 0)
-
-    screen.pen = color.dark_grey
-    id_body.transform = id_body.transform.translate(4, 4)
-    screen.shape(id_body)
-
-    screen.pen = color.white
-    id_body.transform = id_body.transform.translate(-4, -4)
-    screen.shape(id_body)
-    screen.pen = color.black
-    screen.shape(id_outline)
-
     # Draw the card information
     screen.pen = color.black
     if not rear_view:
         content_left = 20
-        photo_y = y + 15
+        photo_y = card_y + content_y_offset + 15
         role_y = photo_y + id_photo.height + 32
 
         screen.font = large_font
@@ -131,7 +148,7 @@ def update():
         header_gap = 6
         header_width, header_height = screen.measure_text(id_name)
         header_x = (screen.width - header_width - header_gap - name_rocket.width) / 2
-        header_y = y + 6
+        header_y = card_y + content_y_offset
         screen.text(id_name, header_x, header_y)
         screen.blit(
             name_rocket,
@@ -152,7 +169,7 @@ def update():
         screen.font = small_font
         qr_visible_height = social_qr.height - (qr_quiet_zone * 2)
         social_content_height = qr_visible_height + qr_label_gap + social_label_height
-        content_top = y + 44
+        content_top = card_y + content_y_offset + 44
 
         social_icon_height = id_socials["twitter"]["icon"].height
         social_step = int(
@@ -176,12 +193,14 @@ def update():
             screen.text(line, line_x, qr_label_y)
             qr_label_y += line_height + qr_label_line_gap
 
+    draw_battery_indicator(battery_level)
     badge.update()
+    rtc.set_alarm(minutes=battery_refresh_minutes)
     wait_for_button_or_alarm(timeout=5000)
 
 
 def on_exit():
-    pass
+    rtc.clear_alarm()
 
 
 run(update)

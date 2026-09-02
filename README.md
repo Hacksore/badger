@@ -15,7 +15,6 @@ The first run clones and builds [Badgeware Desktop](https://github.com/pimoroni/
 Simulator controls:
 
 - `Space`: Button B; flip between the badge and social/QR screens
-- `↑` / `↓`: change the background pattern
 - `←` / `→`: Buttons A and C
 - `Esc`: hot reload
 
