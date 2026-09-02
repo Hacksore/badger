@@ -57,7 +57,6 @@ battery_curve = (
 )
 
 small_font = font.smart
-label_font = font.smart
 large_font = font.ignore
 role_font = font.nope
 
@@ -93,6 +92,13 @@ def draw_battery_indicator(battery_level):
     fill_width = round(((icon_width - 4) / 100) * battery_level)
     screen.pen = color.black
     screen.shape(shape.rectangle(icon_x + 2, icon_y + 2, fill_width, icon_height - 4))
+
+
+def draw_screen_border():
+    screen.pen = color.black
+    screen.shape(
+        shape.rounded_rectangle(1, 1, screen.width - 2, screen.height - 2, 6).stroke(1)
+    )
 
 
 def update():
@@ -170,16 +176,14 @@ def update():
                 header_y + ((header_height - name_rocket.height) / 2),
             ),
         )
-        screen.font = small_font
+        screen.font = role_font
 
         qr_quiet_zone = 12
         qr_label_gap = 4
         qr_label_line_gap = 1
         qr_label_lines = ("WEBSITE",)
         _, social_label_height = screen.measure_text("SOCIALS")
-        screen.font = label_font
         qr_label_sizes = [screen.measure_text(line) for line in qr_label_lines]
-        screen.font = small_font
         qr_visible_height = social_qr.height - (qr_quiet_zone * 2)
         social_content_height = qr_visible_height + qr_label_gap + social_label_height
         content_top = card_y + content_y_offset + 44
@@ -201,13 +205,14 @@ def update():
         qr_y = qr_visible_top - qr_quiet_zone
         screen.blit(social_qr, vec2(qr_x, qr_y))
         qr_label_y = qr_visible_top + qr_visible_height + qr_label_gap
-        screen.font = label_font
+        screen.font = role_font
         for line, (line_width, line_height) in zip(qr_label_lines, qr_label_sizes):
             line_x = qr_x + ((social_qr.width - line_width) / 2)
             screen.text(line, line_x, qr_label_y)
             qr_label_y += line_height + qr_label_line_gap
 
     draw_battery_indicator(battery_level)
+    draw_screen_border()
     badge.update()
     rtc.set_alarm(minutes=battery_refresh_minutes)
     wait_for_button_or_alarm(timeout=5000)
