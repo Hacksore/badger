@@ -44,6 +44,7 @@ for key in social_order:
 rear_view = False
 card_y = 0
 content_y_offset = 10
+front_content_y_offset = -9
 battery_refresh_minutes = 30
 battery_curve = (
     (3.30, 0),
@@ -118,7 +119,7 @@ def update():
     screen.pen = color.black
     if not rear_view:
         content_left = 20
-        photo_y = card_y + content_y_offset + 15
+        photo_y = card_y + content_y_offset + front_content_y_offset + 15
         role_y = photo_y + id_photo.height + 32
         front_name = id_name.upper()
 
