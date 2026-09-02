@@ -17,8 +17,8 @@ screen.antialias = screen.X2
 
 # details to be shown on the card
 id_photo = image.load("avatar.png")
-id_name = "Sean Boult"
-id_role = "Developer @ AWS"
+id_name = "SEAN BOULT"
+id_role_lines = ("DEVELOPER", "AWS")
 
 id_window = image(id_photo.width, id_photo.height)
 id_window.blit(id_photo, vec2(0, 0))
@@ -59,6 +59,7 @@ battery_curve = (
 small_font = font.smart
 label_font = font.smart
 large_font = font.ignore
+role_font = font.nope
 
 
 def battery_level_from_voltage(voltage):
@@ -113,31 +114,43 @@ def update():
         content_left = 20
         photo_y = card_y + content_y_offset + 15
         role_y = photo_y + id_photo.height + 32
+        front_name = id_name.upper()
 
         screen.font = large_font
-        name_width, _ = screen.measure_text(id_name)
-        photo_x = content_left + ((name_width - id_photo.width) / 2)
-        screen.blit(id_window, vec2(photo_x, photo_y))
-        screen.text(id_name, content_left, photo_y + id_photo.height + 4)
-        screen.font = small_font
-        screen.text(id_role, content_left, role_y)
+        name_width, _ = screen.measure_text(front_name)
+        front_center_x = content_left + (name_width / 2)
+        photo_x = front_center_x - (id_photo.width / 2)
+        screen.blit(id_window, vec2(photo_x, photo_y + 5))
+        screen.text(front_name, content_left, photo_y + id_photo.height + 4)
+
+        screen.font = role_font
+        role_line_gap = 0
+        role_sizes = [screen.measure_text(line) for line in id_role_lines]
+        for line, (line_width, line_height) in zip(id_role_lines, role_sizes):
+            line_x = content_left + ((name_width - line_width) / 2)
+            screen.text(line, line_x, role_y)
+            role_y += line_height + role_line_gap
 
         qr_quiet_zone = 12
         qr_label_gap = 4
         qr_label_line_gap = 1
         qr_label_lines = ("SCAN HERE", "FOR LINKEDIN")
+        screen.font = role_font
         qr_label_sizes = [screen.measure_text(line) for line in qr_label_lines]
-        _, role_height = screen.measure_text(id_role)
-        qr_visible_height = linkedin_qr.height - (qr_quiet_zone * 2)
-        qr_visible_bottom = role_y + role_height
-        qr_visible_top = qr_visible_bottom - qr_visible_height
-        qr_x = screen.width - content_left - linkedin_qr.width + 6
+        qr_label_height = sum(height for _, height in qr_label_sizes)
+        qr_label_height += qr_label_line_gap * (len(qr_label_lines) - 1)
+        qr_group_height = (
+            qr_label_height
+            + qr_label_gap
+            + linkedin_qr.height
+            - qr_quiet_zone
+        )
+        qr_label_y = ((screen.height - qr_group_height) / 2) + 8
+        qr_visible_top = qr_label_y + qr_label_height + qr_label_gap
+        qr_x = screen.width - content_left - linkedin_qr.width + 10
         qr_y = qr_visible_top - qr_quiet_zone
 
         screen.blit(linkedin_qr, vec2(qr_x, qr_y))
-        qr_label_height = sum(height for _, height in qr_label_sizes)
-        qr_label_height += qr_label_line_gap * (len(qr_label_lines) - 1)
-        qr_label_y = qr_visible_top - qr_label_gap - qr_label_height
         for line, (line_width, line_height) in zip(qr_label_lines, qr_label_sizes):
             line_x = qr_x + ((linkedin_qr.width - line_width) / 2)
             screen.text(line, line_x, qr_label_y)
@@ -162,7 +175,7 @@ def update():
         qr_quiet_zone = 12
         qr_label_gap = 4
         qr_label_line_gap = 1
-        qr_label_lines = ("PERSONAL", "WEBSITE")
+        qr_label_lines = ("WEBSITE",)
         _, social_label_height = screen.measure_text("SOCIALS")
         screen.font = label_font
         qr_label_sizes = [screen.measure_text(line) for line in qr_label_lines]
@@ -183,7 +196,8 @@ def update():
             socials_y += social_step
 
         qr_x = 149
-        qr_visible_top = content_top - 5
+        qr_vertical_offset = 12
+        qr_visible_top = content_top - 5 + qr_vertical_offset
         qr_y = qr_visible_top - qr_quiet_zone
         screen.blit(social_qr, vec2(qr_x, qr_y))
         qr_label_y = qr_visible_top + qr_visible_height + qr_label_gap
