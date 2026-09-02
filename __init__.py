@@ -166,8 +166,11 @@ def update():
         screen.pen = color.black
         screen.font = large_font
         header_gap = 6
+        header_optical_offset = 3
         header_width, header_height = screen.measure_text(id_name)
-        header_x = (screen.width - header_width - header_gap - name_rocket.width) / 2
+        header_x = (
+            (screen.width - header_width - header_gap - name_rocket.width) / 2
+        ) + header_optical_offset
         header_y = card_y + content_y_offset
         screen.text(id_name, header_x, header_y)
         screen.blit(
